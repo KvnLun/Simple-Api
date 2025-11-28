@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .method-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .method-btn {
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .method-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .method-btn.active {
+            color: white;
+            border-color: transparent;
+        }
+
+        .method-btn.get.active {
+            background: #28a745;
+        }
+
+        .method-btn.post.active {
+            background: #007bff;
+        }
+
+        .method-btn.put.active {
+            background: #ffc107;
+        }
+
+        .method-btn.delete.active {
+            background: #dc3545;
+        }
+
+        .headers-container {
+            margin-bottom: 20px;
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        .response-section {
+            grid-column: 1 / -1;
+        }
+
+        .response-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .response-content {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .query-params {
+            margin-bottom: 20px;
+        }
+
+        .param-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .history-section {
+            grid-column: 1 / -1;
+        }
+
+        .history-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .history-method {
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .history-url {
+            color: #666;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .history-time {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .json-key {
+            color: #9cdcfe;
+        }
+
+        .json-string {
+            color: #ce9178;
+        }
+
+        .json-number {
+            color: #b5cea8;
+        }
+
+        .json-boolean {
+            color: #569cd6;
+        }
+
+        .json-null {
+            color: #569cd6;
+        }
+
+        .copy-btn {
+            float: right;
+            background: #444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn:hover {
+            background: #555;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .response-section,
+            .history-section {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 API Testing Client</h1>
+            <p>Test and debug your local backend APIs with ease</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Request Configuration -->
+            <div class="section">
+                <h2>Request Configuration</h2>
+                
+                <div class="form-group">
+                    <label>HTTP Method</label>
+                    <div class="method-selector">
+                        <button class="method-btn get active" onclick="selectMethod('GET')">GET</button>
+                        <button class="method-btn post" onclick="selectMethod('POST')">POST</button>
+                        <button class="method-btn put" onclick="selectMethod('PUT')">PUT</button>
+                        <button class="method-btn delete" onclick="selectMethod('DELETE')">DELETE</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Base URL</label>
+                    <input type="text" id="baseUrl" placeholder="http://localhost:8080" value="http://localhost:8080">
+                </div>
+
+                <div class="form-group">
+                    <label>Endpoint Path</label>
+                    <input type="text" id="endpoint" placeholder="/api/users" value="/api/test">
+                </div>
+
+                <div class="form-group">
+                    <label>Query Parameters</label>
+                    <div id="queryParams" class="query-params"></div>
+                    <button class="btn btn-secondary btn-small" onclick="addQueryParam()">+ Add Parameter</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Request Timeout (ms)</label>
+                    <input type="number" id="timeout" value="5000" min="1000" max="60000">
+                </div>
+            </div>
+
+            <!-- Headers and Body -->
+            <div class="section">
+                <h2>Headers & Body</h2>
+                
+                <div class="form-group">
+                    <label>Headers</label>
+                    <div id="headers" class="headers-container"></div>
+                    <button class="btn btn-secondary btn-small" onclick="addHeader()">+ Add Header</button>
+                </div>
+
+                <div class="form-group" id="bodySection" style="display: none;">
+                    <label>Request Body (JSON)</label>
+                    <textarea id="requestBody" placeholder='{"key": "value"}'></textarea>
+                </div>
+
+                <button class="btn btn-primary send-btn" onclick="sendRequest()">
+                    Send Request
+                </button>
+            </div>
+
+            <!-- Response Section -->
+            <div class="section response-section">
+                <h2>Response</h2>
+                
+                <div class="response-tabs">
+                    <button class="tab-btn active" onclick="switchTab('body')">Body</button>
+                    <button class="tab-btn" onclick="switchTab('headers')">Headers</button>
+                    <button class="tab-btn" onclick="switchTab('raw')">Raw</button>
+                </div>
+
+                <div id="responseContainer" class="response-content">
+                    <div style="text-align: center; color: #888; padding: 40px;">
+                        No response yet. Send a request to see results.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request History -->
+            <div class="section history-section">
+                <h2>Request History</h2>
+                <div id="historyContainer">
+                    <div style="text-align: center; color: #888; padding: 20px;">
+                        No requests sent yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMethod = 'GET';
+        let requestHistory = [];
+        let currentResponse = null;
+        let currentTab = 'body';
+
+        // Initialize with default header
+        window.onload = function() {
+            addHeader('Content-Type', 'application/json');
+        };
+
+        function selectMethod(method) {
+            currentMethod = method;
+            
+            // Update button states
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide body section
+            const bodySection = document.getElementById('bodySection');
+            if (method === 'POST' || method === 'PUT') {
+                bodySection.style.display = 'block';
+            } else {
+                bodySection.style.display = 'none';
+            }
+        }
+
+        function addHeader(key = '', value = '') {
+            const container = document.getElementById('headers');
+            const row = document.createElement('div');
+            row.className = 'header-row';
+            
+            row.innerHTML = `
+                <input type="text" placeholder="Header Name" value="${key}">
+                <input type="text" placeholder="Header Value" value="${value}">
+                <button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            
+            container.appendChild(row);
+        }
+
+        function addQueryParam(key = '', value = '') {
+            const container = document.getElementById('queryParams');
+            const row = document.createElement('div');
+            row.className = 'param-row';
+            
+            row.innerHTML = `
+                <input type="text" placeholder="Parameter Name" value="${key}">
+                <input type="text" placeholder="Parameter Value" value="${value}">
+                <button class="btn btn-danger btn-small" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            
+            container.appendChild(row);
+        }
+
+        function getHeaders() {
+            const headers = {};
+            const rows = document.querySelectorAll('#headers .header-row');
+            
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const key = inputs[0].value.trim();
+                const value = inputs[1].value.trim();
+                
+                if (key) {
+                    headers[key] = value;
+                }
+            });
+            
+            return headers;
+        }
+
+        function getQueryParams() {
+            const params = {};
+            const rows = document.querySelectorAll('#queryParams .param-row');
+            
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const key = inputs[0].value.trim();
+                const value = inputs[1].value.trim();
+                
+                if (key) {
+                    params[key] = value;
+                }
+            });
+            
+            return params;
+        }
+
+        function buildUrl() {
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            const endpoint = document.getElementById('endpoint').value.trim();
+            const queryParams = getQueryParams();
+            
+            let url = baseUrl + endpoint;
+            
+            const paramString = new URLSearchParams(queryParams).toString();
+            if (paramString) {
+                url += '?' + paramString;
+            }
+            
+            return url;
+        }
+
+        async function sendRequest() {
+            const url = buildUrl();
+            const headers = getHeaders();
+            const timeout = parseInt(document.getElementById('timeout').value);
+            
+            const requestConfig = {
+                method: currentMethod,
+                headers: headers
+            };
+
+            // Add body for POST/PUT
+            if (currentMethod === 'POST' || currentMethod === 'PUT') {
+                const bodyText = document.getElementById('requestBody').value.trim();
+                if (bodyText) {
+                    try {
+                        JSON.parse(bodyText); // Validate JSON
+                        requestConfig.body = bodyText;
+                    } catch (e) {
+                        showError('Invalid JSON in request body: ' + e.message);
+                        return;
+                    }
+                }
+            }
+
+            // Show loading
+            showLoading();
+
+            const startTime = Date.now();
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+                const response = await fetch(url, {
+                    ...requestConfig,
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                // Get response data
+                const contentType = response.headers.get('content-type');
+                let responseData;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                // Store response
+                currentResponse = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries()),
+                    data: responseData,
+                    duration: duration,
+                    url: url,
+                    method: currentMethod
+                };
+
+                // Add to history
+                addToHistory(currentResponse);
+
+                // Display response
+                displayResponse();
+
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    showError('Request timed out after ' + timeout + 'ms');
+                } else {
+                    showError('Request failed: ' + error.message);
+                }
+            }
+        }
+
+        function showLoading() {
+            const container = document.getElementById('responseContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Sending request...</div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('responseContainer');
+            container.innerHTML = `
+                <div class="status-badge status-error">ERROR</div>
+                <pre>${message}</pre>
+            `;
+        }
+
+        function displayResponse() {
+            if (!currentResponse) return;
+
+            const container = document.getElementById('responseContainer');
+            const statusClass = currentResponse.status < 400 ? 'status-success' : 'status-error';
+
+            if (currentTab === 'body') {
+                const formattedData = typeof currentResponse.data === 'object' 
+                    ? syntaxHighlight(JSON.stringify(currentResponse.data, null, 2))
+                    : currentResponse.data;
+
+                container.innerHTML = `
+                    <button class="copy-btn" onclick="copyToClipboard('body')">Copy</button>
+                    <div class="status-badge ${statusClass}">
+                        ${currentResponse.status} ${currentResponse.statusText} 
+                        (${currentResponse.duration}ms)
+                    </div>
+                    <pre>${formattedData}</pre>
+                `;
+            } else if (currentTab === 'headers') {
+                const headersHtml = syntaxHighlight(JSON.stringify(currentResponse.headers, null, 2));
+                container.innerHTML = `
+                    <button class="copy-btn" onclick="copyToClipboard('headers')">Copy</button>
+                    <div class="status-badge ${statusClass}">Response Headers</div>
+                    <pre>${headersHtml}</pre>
+                `;
+            } else if (currentTab === 'raw') {
+                const rawData = typeof currentResponse.data === 'object'
+                    ? JSON.stringify(currentResponse.data)
+                    : currentResponse.data;
+                
+                container.innerHTML = `
+                    <button class="copy-btn" onclick="copyToClipboard('raw')">Copy</button>
+                    <div class="status-badge ${statusClass}">Raw Response</div>
+                    <pre>${escapeHtml(rawData)}</pre>
+                `;
+            }
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayResponse();
+        }
+
+        function copyToClipboard(type) {
+            let text = '';
+            
+            if (type === 'body') {
+                text = typeof currentResponse.data === 'object' 
+                    ? JSON.stringify(currentResponse.data, null, 2)
+                    : currentResponse.data;
+            } else if (type === 'headers') {
+                text = JSON.stringify(currentResponse.headers, null, 2);
+            } else if (type === 'raw') {
+                text = typeof currentResponse.data === 'object'
+                    ? JSON.stringify(currentResponse.data)
+                    : currentResponse.data;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                event.target.textContent = 'Copied!';
+                setTimeout(() => {
+                    event.target.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        function addToHistory(response) {
+            const historyItem = {
+                ...response,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            requestHistory.unshift(historyItem);
+            if (requestHistory.length > 10) {
+                requestHistory.pop();
+            }
+            
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (requestHistory.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #888; padding: 20px;">
+                        No requests sent yet.
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = requestHistory.map((item, index) => {
+                const methodColor = {
+                    'GET': '#28a745',
+                    'POST': '#007bff',
+                    'PUT': '#ffc107',
+                    'DELETE': '#dc3545'
+                }[item.method];
+                
+                const statusClass = item.status < 400 ? 'status-success' : 'status-error';
+                
+                return `
+                    <div class="history-item" onclick="loadFromHistory(${index})">
+                        <div class="history-item-header">
+                            <div>
+                                <span class="history-method" style="background: ${methodColor}">${item.method}</span>
+                                <span class="status-badge ${statusClass}" style="margin-left: 10px;">
+                                    ${item.status} (${item.duration}ms)
+                                </span>
+                            </div>
+                            <span class="history-time">${item.timestamp}</span>
+                        </div>
+                        <div class="history-url">${item.url}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadFromHistory(index) {
+            const item = requestHistory[index];
+            currentResponse = item;
+            displayResponse();
+        }
+    </script>
+</body>
+</html>
