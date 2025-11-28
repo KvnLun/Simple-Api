@@ -1,6 +1,6 @@
 # API Testing Client
 
-A modern, user-friendly web-based API testing tool built with pure HTML, CSS, and JavaScript. Test RESTful APIs with an intuitive interface featuring syntax highlighting, request history, and comprehensive response analysis.
+A modern, user-friendly web-based API testing tool built with pure HTML, CSS, and JavaScript. Test RESTful APIs with an intuitive interface featuring syntax highlighting, request history, and comprehensive response analysis. The main purpose for this is to support learning API backend programs and testing personal project API endpoints.
 
 ## Features
 
